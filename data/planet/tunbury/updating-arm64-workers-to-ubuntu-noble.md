@@ -1,0 +1,59 @@
+---
+title: Updating ARM64 Workers to Ubuntu Noble
+description: "Early in the upgrade program for Ubuntu 24.04, there were permission
+  issues when extracting tar files. The workaround was to update to the latest dev
+  version of Docker. However, this didn\u2019t resolve all the issues on ARM64, so
+  only one machine was updated and excluded from the base image builder work."
+url: https://www.tunbury.org/2026/01/16/arm64-workers/
+date: 2026-01-16T17:00:00-00:00
+preview_image: https://www.tunbury.org/images/ubuntu.png
+authors:
+- Mark Elvers
+source:
+ignore:
+---
+
+<p>Early in the upgrade program for Ubuntu 24.04, there were <a href="https://github.com/ocaml/infrastructure/issues/121">permission issues</a> when extracting <code class="language-plaintext highlighter-rouge">tar</code> files. The workaround was to update to the latest <code class="language-plaintext highlighter-rouge">dev</code> version of Docker. However, this didn’t resolve all the issues on ARM64, so only one machine was updated and excluded from the base image builder work.</p>
+
+<p>There were <a href="https://github.com/tarides/infrastructure/issues/331">segmentation faults</a> at the second stage of the build process. This cleared due to upstream updates.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#8 24.53 # gcc -c -O2 -fno-strict-aliasing -fwrapv -Wall -fno-common -g -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DCAML_NAME_SPACE -DOCAML_STDLIB_DIR='"/home/opam/.opam/4.09/lib/ocaml"' -o prims.o prims.c
+#8 24.53 # rm -f libcamlrund.a &amp;&amp; ar rc libcamlrund.a interp_bd.o misc_bd.o stacks_bd.o fix_code_bd.o startup_aux_bd.o startup_byt_bd.o freelist_bd.o major_gc_bd.o minor_gc_bd.o memory_bd.o alloc_bd.o roots_byt_bd.o globroots_bd.o fail_byt_bd.o signals_bd.o signals_byt_bd.o printexc_bd.o backtrace_byt_bd.o backtrace_bd.o compare_bd.o ints_bd.o floats_bd.o str_bd.o array_bd.o io_bd.o extern_bd.o intern_bd.o hash_bd.o sys_bd.o meta_bd.o parsing_bd.o gc_ctrl_bd.o md5_bd.o obj_bd.o lexing_bd.o callback_bd.o debugger_bd.o weak_bd.o compact_bd.o finalise_bd.o custom_bd.o dynlink_bd.o spacetime_byt_bd.o afl_bd.o unix_bd.o bigarray_bd.o main_bd.o instrtrace_bd.o &amp;&amp; ranlib libcamlrund.a
+#8 24.53 # gcc -O2 -fno-strict-aliasing -fwrapv -Wall -fno-common -g -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DCAML_NAME_SPACE -DOCAML_STDLIB_DIR='"/home/opam/.opam/4.09/lib/ocaml"' -Wl,-E -g -o ocamlrund prims.o libcamlrund.a -lm -lpthread 
+#8 24.53 # rm -f libcamlruni.a &amp;&amp; ar rc libcamlruni.a interp_bi.o misc_bi.o stacks_bi.o fix_code_bi.o startup_aux_bi.o startup_byt_bi.o freelist_bi.o major_gc_bi.o minor_gc_bi.o memory_bi.o alloc_bi.o roots_byt_bi.o globroots_bi.o fail_byt_bi.o signals_bi.o signals_byt_bi.o printexc_bi.o backtrace_byt_bi.o backtrace_bi.o compare_bi.o ints_bi.o floats_bi.o str_bi.o array_bi.o io_bi.o extern_bi.o intern_bi.o hash_bi.o sys_bi.o meta_bi.o parsing_bi.o gc_ctrl_bi.o md5_bi.o obj_bi.o lexing_bi.o callback_bi.o debugger_bi.o weak_bi.o compact_bi.o finalise_bi.o custom_bi.o dynlink_bi.o spacetime_byt_bi.o afl_bi.o unix_bi.o bigarray_bi.o main_bi.o &amp;&amp; ranlib libcamlruni.a
+#8 24.53 # gcc -O2 -fno-strict-aliasing -fwrapv -Wall -fno-common -g -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DCAML_NAME_SPACE -DOCAML_STDLIB_DIR='"/home/opam/.opam/4.09/lib/ocaml"' -Wl,-E -o ocamlruni prims.o libcamlruni.a -lm -lpthread 
+#8 24.53 # rm -f libcamlrun_pic.a &amp;&amp; ar rc libcamlrun_pic.a interp_bpic.o misc_bpic.o stacks_bpic.o fix_code_bpic.o startup_aux_bpic.o startup_byt_bpic.o freelist_bpic.o major_gc_bpic.o minor_gc_bpic.o memory_bpic.o alloc_bpic.o roots_byt_bpic.o globroots_bpic.o fail_byt_bpic.o signals_bpic.o signals_byt_bpic.o printexc_bpic.o backtrace_byt_bpic.o backtrace_bpic.o compare_bpic.o ints_bpic.o floats_bpic.o str_bpic.o array_bpic.o io_bpic.o extern_bpic.o intern_bpic.o hash_bpic.o sys_bpic.o meta_bpic.o parsing_bpic.o gc_ctrl_bpic.o md5_bpic.o obj_bpic.o lexing_bpic.o callback_bpic.o debugger_bpic.o weak_bpic.o compact_bpic.o finalise_bpic.o custom_bpic.o dynlink_bpic.o spacetime_byt_bpic.o afl_bpic.o unix_bpic.o bigarray_bpic.o main_bpic.o &amp;&amp; ranlib libcamlrun_pic.a
+#8 24.53 # gcc -shared -o libcamlrun_shared.so interp_bpic.o misc_bpic.o stacks_bpic.o fix_code_bpic.o startup_aux_bpic.o startup_byt_bpic.o freelist_bpic.o major_gc_bpic.o minor_gc_bpic.o memory_bpic.o alloc_bpic.o roots_byt_bpic.o globroots_bpic.o fail_byt_bpic.o signals_bpic.o signals_byt_bpic.o printexc_bpic.o backtrace_byt_bpic.o backtrace_bpic.o compare_bpic.o ints_bpic.o floats_bpic.o str_bpic.o array_bpic.o io_bpic.o extern_bpic.o intern_bpic.o hash_bpic.o sys_bpic.o meta_bpic.o parsing_bpic.o gc_ctrl_bpic.o md5_bpic.o obj_bpic.o lexing_bpic.o callback_bpic.o debugger_bpic.o weak_bpic.o compact_bpic.o finalise_bpic.o custom_bpic.o dynlink_bpic.o spacetime_byt_bpic.o afl_bpic.o unix_bpic.o bigarray_bpic.o main_bpic.o -lm -lpthread 
+#8 24.53 # rm -f libcamlrun.a &amp;&amp; ar rc libcamlrun.a interp_b.o misc_b.o stacks_b.o fix_code_b.o startup_aux_b.o startup_byt_b.o freelist_b.o major_gc_b.o minor_gc_b.o memory_b.o alloc_b.o roots_byt_b.o globroots_b.o fail_byt_b.o signals_b.o signals_byt_b.o printexc_b.o backtrace_byt_b.o backtrace_b.o compare_b.o ints_b.o floats_b.o str_b.o array_b.o io_b.o extern_b.o intern_b.o hash_b.o sys_b.o meta_b.o parsing_b.o gc_ctrl_b.o md5_b.o obj_b.o lexing_b.o callback_b.o debugger_b.o weak_b.o compact_b.o finalise_b.o custom_b.o dynlink_b.o spacetime_byt_b.o afl_b.o unix_b.o bigarray_b.o main_b.o &amp;&amp; ranlib libcamlrun.a
+#8 24.53 # gcc -O2 -fno-strict-aliasing -fwrapv -Wall -fno-common -g -D_FILE_OFFSET_BITS=64 -D_REENTRANT -DCAML_NAME_SPACE -DOCAML_STDLIB_DIR='"/home/opam/.opam/4.09/lib/ocaml"' -Wl,-E -o ocamlrun prims.o libcamlrun.a -lm -lpthread 
+#8 24.53 # make[1]: Leaving directory '/home/opam/.opam/4.09/.opam-switch/build/ocaml-variants.4.09.1+flambda/runtime'
+#8 24.53 # cp runtime/ocamlrun boot/ocamlrun
+#8 24.53 # /usr/bin/make -C stdlib \
+#8 24.53 # CAMLC='$(BOOT_OCAMLC) -use-prims ../runtime/primitives' all
+#8 24.53 # make[1]: Entering directory '/home/opam/.opam/4.09/.opam-switch/build/ocaml-variants.4.09.1+flambda/stdlib'
+#8 24.53 # ../boot/ocamlrun ../boot/ocamlc -use-prims ../runtime/primitives -strict-sequence -absname -w +a-4-9-41-42-44-45-48 -g -warn-error A -bin-annot -nostdlib -safe-string -strict-formats -nopervasives -c camlinternalFormatBasics.mli
+#8 24.53 # sed -e "s|%%VERSION%%|`sed -e 1q ../VERSION | tr -d '\r'`|" sys.mlp &gt; sys.ml
+#8 24.53 # make[1]: *** [Makefile:218: camlinternalFormatBasics.cmi] Segmentation fault (core dumped)
+#8 24.53 # make[1]: *** Waiting for unfinished jobs....
+#8 24.53 # make[1]: Leaving directory '/home/opam/.opam/4.09/.opam-switch/build/ocaml-variants.4.09.1+flambda/stdlib'
+#8 24.53 # make: *** [Makefile:345: coldstart] Error 2
+</code></pre></div></div>
+
+<p>The remaining <a href="https://images.ci.ocaml.org/job/2026-01-15/084331-ocluster-build-69c63c">error</a> was this innocuous <code class="language-plaintext highlighter-rouge">COPY</code> command. It was possible to work around this by changing the <code class="language-plaintext highlighter-rouge">chown</code> section to <code class="language-plaintext highlighter-rouge">--chown=1000:1000</code>, but that was odd as it wasn’t needed on any other system.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Dockerfile:78
+--------------------
+  76 |     RUN git config --global user.email "docker@example.com"
+  77 |     RUN git config --global user.name "Docker"
+  78 | &gt;&gt;&gt; COPY --link --chown=opam:opam [ ".", "/home/opam/opam-repository" ]
+  79 |     RUN opam-sandbox-disable
+  80 |     RUN opam init -k git -a /home/opam/opam-repository --bare
+--------------------
+ERROR: failed to solve: invalid user index: -1
+</code></pre></div></div>
+
+<p>The root cause, which I have investigated today, is a version mismatch between the Docker <code class="language-plaintext highlighter-rouge">dev</code> daemon and the <code class="language-plaintext highlighter-rouge">27.5.1</code> client on the (partially) updated system. It’s interesting to note that client version <code class="language-plaintext highlighter-rouge">20.10.21</code> worked against the <code class="language-plaintext highlighter-rouge">dev</code> daemon.</p>
+
+<p>Anyway, none of this is a concern any longer, as Ubuntu now packages Docker 28.2.2. The system can be upgraded via <code class="language-plaintext highlighter-rouge">apt</code>, and everything works as expected.</p>
+
+<p>The ARM64 workers have been updated using this <a href="https://gist.github.com/mtelvers/dbc3828eab622530a67d72535feb5908">Ansible playbook</a>.</p>
